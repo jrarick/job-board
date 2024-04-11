@@ -1,0 +1,27 @@
+const jobCategories = [
+  'Healthcare',
+  'Education',
+  'Engineering',
+  'Skilled Trades',
+  'General Labor',
+  'Ministry',
+  'Technology',
+  'Finance',
+  'Sales',
+  'Marketing',
+  'Admin/Office',
+  'Legal',
+  'Recreation',
+  'Automotive',
+  'Photo/Video',
+  'Art',
+  'Music',
+  'Retail',
+  'Hospitality',
+  'Beauty',
+  'Restaurant',
+  'Athletics/Fitness',
+  'Other',
+]
+
+export default jobCategories
