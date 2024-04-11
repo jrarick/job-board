@@ -3,7 +3,7 @@
  * Client
 **/
 
-import * as runtime from './runtime/library.js';
+import * as runtime from './runtime/library';
 import $Types = runtime.Types // general types
 import $Public = runtime.Types.Public
 import $Utils = runtime.Types.Utils
@@ -237,8 +237,8 @@ export namespace Prisma {
   export import Exact = $Public.Exact
 
   /**
-   * Prisma Client JS version: 5.12.1
-   * Query Engine version: 473ed3124229e22d881cb7addf559799debae1ab
+   * Prisma Client JS version: 5.8.1
+   * Query Engine version: 78caf6feeaed953168c64e15a249c3e9a033ebe2
    */
   export type PrismaVersion = {
     client: string
@@ -701,10 +701,6 @@ export namespace Prisma {
             args: Prisma.UserCreateArgs<ExtArgs>,
             result: $Utils.PayloadToResult<Prisma.$UserPayload>
           }
-          createMany: {
-            args: Prisma.UserCreateManyArgs<ExtArgs>,
-            result: Prisma.BatchPayload
-          }
           delete: {
             args: Prisma.UserDeleteArgs<ExtArgs>,
             result: $Utils.PayloadToResult<Prisma.$UserPayload>
@@ -767,10 +763,6 @@ export namespace Prisma {
             args: Prisma.PasswordCreateArgs<ExtArgs>,
             result: $Utils.PayloadToResult<Prisma.$PasswordPayload>
           }
-          createMany: {
-            args: Prisma.PasswordCreateManyArgs<ExtArgs>,
-            result: Prisma.BatchPayload
-          }
           delete: {
             args: Prisma.PasswordDeleteArgs<ExtArgs>,
             result: $Utils.PayloadToResult<Prisma.$PasswordPayload>
@@ -832,10 +824,6 @@ export namespace Prisma {
           create: {
             args: Prisma.JobPostingCreateArgs<ExtArgs>,
             result: $Utils.PayloadToResult<Prisma.$JobPostingPayload>
-          }
-          createMany: {
-            args: Prisma.JobPostingCreateManyArgs<ExtArgs>,
-            result: Prisma.BatchPayload
           }
           delete: {
             args: Prisma.JobPostingDeleteArgs<ExtArgs>,
@@ -928,16 +916,6 @@ export namespace Prisma {
      * Read more in our [docs](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/logging#the-log-option).
      */
     log?: (LogLevel | LogDefinition)[]
-    /**
-     * The default values for transactionOptions
-     * maxWait ?= 2000
-     * timeout ?= 5000
-     */
-    transactionOptions?: {
-      maxWait?: number
-      timeout?: number
-      isolationLevel?: Prisma.TransactionIsolationLevel
-    }
   }
 
   /* Types for Logging */
@@ -1384,22 +1362,6 @@ export namespace Prisma {
     create<T extends UserCreateArgs<ExtArgs>>(
       args: SelectSubset<T, UserCreateArgs<ExtArgs>>
     ): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, 'create'>, never, ExtArgs>
-
-    /**
-     * Create many Users.
-     *     @param {UserCreateManyArgs} args - Arguments to create many Users.
-     *     @example
-     *     // Create many Users
-     *     const user = await prisma.user.createMany({
-     *       data: {
-     *         // ... provide data here
-     *       }
-     *     })
-     *     
-    **/
-    createMany<T extends UserCreateManyArgs<ExtArgs>>(
-      args?: SelectSubset<T, UserCreateManyArgs<ExtArgs>>
-    ): Prisma.PrismaPromise<BatchPayload>
 
     /**
      * Delete a User.
@@ -1877,17 +1839,6 @@ export namespace Prisma {
 
 
   /**
-   * User createMany
-   */
-  export type UserCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * The data used to create many Users.
-     */
-    data: UserCreateManyInput | UserCreateManyInput[]
-  }
-
-
-  /**
    * User update
    */
   export type UserUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2311,22 +2262,6 @@ export namespace Prisma {
     create<T extends PasswordCreateArgs<ExtArgs>>(
       args: SelectSubset<T, PasswordCreateArgs<ExtArgs>>
     ): Prisma__PasswordClient<$Result.GetResult<Prisma.$PasswordPayload<ExtArgs>, T, 'create'>, never, ExtArgs>
-
-    /**
-     * Create many Passwords.
-     *     @param {PasswordCreateManyArgs} args - Arguments to create many Passwords.
-     *     @example
-     *     // Create many Passwords
-     *     const password = await prisma.password.createMany({
-     *       data: {
-     *         // ... provide data here
-     *       }
-     *     })
-     *     
-    **/
-    createMany<T extends PasswordCreateManyArgs<ExtArgs>>(
-      args?: SelectSubset<T, PasswordCreateManyArgs<ExtArgs>>
-    ): Prisma.PrismaPromise<BatchPayload>
 
     /**
      * Delete a Password.
@@ -2794,17 +2729,6 @@ export namespace Prisma {
      * The data needed to create a Password.
      */
     data: XOR<PasswordCreateInput, PasswordUncheckedCreateInput>
-  }
-
-
-  /**
-   * Password createMany
-   */
-  export type PasswordCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * The data used to create many Passwords.
-     */
-    data: PasswordCreateManyInput | PasswordCreateManyInput[]
   }
 
 
@@ -3405,22 +3329,6 @@ export namespace Prisma {
     ): Prisma__JobPostingClient<$Result.GetResult<Prisma.$JobPostingPayload<ExtArgs>, T, 'create'>, never, ExtArgs>
 
     /**
-     * Create many JobPostings.
-     *     @param {JobPostingCreateManyArgs} args - Arguments to create many JobPostings.
-     *     @example
-     *     // Create many JobPostings
-     *     const jobPosting = await prisma.jobPosting.createMany({
-     *       data: {
-     *         // ... provide data here
-     *       }
-     *     })
-     *     
-    **/
-    createMany<T extends JobPostingCreateManyArgs<ExtArgs>>(
-      args?: SelectSubset<T, JobPostingCreateManyArgs<ExtArgs>>
-    ): Prisma.PrismaPromise<BatchPayload>
-
-    /**
      * Delete a JobPosting.
      * @param {JobPostingDeleteArgs} args - Arguments to delete one JobPosting.
      * @example
@@ -3903,17 +3811,6 @@ export namespace Prisma {
      * The data needed to create a JobPosting.
      */
     data: XOR<JobPostingCreateInput, JobPostingUncheckedCreateInput>
-  }
-
-
-  /**
-   * JobPosting createMany
-   */
-  export type JobPostingCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * The data used to create many JobPostings.
-     */
-    data: JobPostingCreateManyInput | JobPostingCreateManyInput[]
   }
 
 
@@ -4410,15 +4307,6 @@ export namespace Prisma {
     jobPostings?: JobPostingUncheckedUpdateManyWithoutAuthorNestedInput
   }
 
-  export type UserCreateManyInput = {
-    id?: string
-    email: string
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    firstName: string
-    lastName: string
-  }
-
   export type UserUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
@@ -4455,11 +4343,6 @@ export namespace Prisma {
   export type PasswordUncheckedUpdateInput = {
     hash?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
-  }
-
-  export type PasswordCreateManyInput = {
-    hash: string
-    userId: string
   }
 
   export type PasswordUpdateManyMutationInput = {
@@ -4557,28 +4440,6 @@ export namespace Prisma {
     contactEmail?: NullableStringFieldUpdateOperationsInput | string | null
     contactPhone?: NullableStringFieldUpdateOperationsInput | string | null
     customInstructions?: NullableStringFieldUpdateOperationsInput | string | null
-  }
-
-  export type JobPostingCreateManyInput = {
-    id?: string
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    authorId: string
-    jobTitle: string
-    companyName: string
-    companyWebsite?: string | null
-    category: string
-    employmentType: string
-    salaryMin?: number | null
-    salaryMax?: number | null
-    salaryType: string
-    partOfTown?: string | null
-    workPresence: string
-    jobDescription: string
-    linkToApply?: string | null
-    contactEmail?: string | null
-    contactPhone?: string | null
-    customInstructions?: string | null
   }
 
   export type JobPostingUpdateManyMutationInput = {
@@ -4890,7 +4751,6 @@ export namespace Prisma {
   export type JobPostingCreateNestedManyWithoutAuthorInput = {
     create?: XOR<JobPostingCreateWithoutAuthorInput, JobPostingUncheckedCreateWithoutAuthorInput> | JobPostingCreateWithoutAuthorInput[] | JobPostingUncheckedCreateWithoutAuthorInput[]
     connectOrCreate?: JobPostingCreateOrConnectWithoutAuthorInput | JobPostingCreateOrConnectWithoutAuthorInput[]
-    createMany?: JobPostingCreateManyAuthorInputEnvelope
     connect?: JobPostingWhereUniqueInput | JobPostingWhereUniqueInput[]
   }
 
@@ -4903,7 +4763,6 @@ export namespace Prisma {
   export type JobPostingUncheckedCreateNestedManyWithoutAuthorInput = {
     create?: XOR<JobPostingCreateWithoutAuthorInput, JobPostingUncheckedCreateWithoutAuthorInput> | JobPostingCreateWithoutAuthorInput[] | JobPostingUncheckedCreateWithoutAuthorInput[]
     connectOrCreate?: JobPostingCreateOrConnectWithoutAuthorInput | JobPostingCreateOrConnectWithoutAuthorInput[]
-    createMany?: JobPostingCreateManyAuthorInputEnvelope
     connect?: JobPostingWhereUniqueInput | JobPostingWhereUniqueInput[]
   }
 
@@ -4929,7 +4788,6 @@ export namespace Prisma {
     create?: XOR<JobPostingCreateWithoutAuthorInput, JobPostingUncheckedCreateWithoutAuthorInput> | JobPostingCreateWithoutAuthorInput[] | JobPostingUncheckedCreateWithoutAuthorInput[]
     connectOrCreate?: JobPostingCreateOrConnectWithoutAuthorInput | JobPostingCreateOrConnectWithoutAuthorInput[]
     upsert?: JobPostingUpsertWithWhereUniqueWithoutAuthorInput | JobPostingUpsertWithWhereUniqueWithoutAuthorInput[]
-    createMany?: JobPostingCreateManyAuthorInputEnvelope
     set?: JobPostingWhereUniqueInput | JobPostingWhereUniqueInput[]
     disconnect?: JobPostingWhereUniqueInput | JobPostingWhereUniqueInput[]
     delete?: JobPostingWhereUniqueInput | JobPostingWhereUniqueInput[]
@@ -4953,7 +4811,6 @@ export namespace Prisma {
     create?: XOR<JobPostingCreateWithoutAuthorInput, JobPostingUncheckedCreateWithoutAuthorInput> | JobPostingCreateWithoutAuthorInput[] | JobPostingUncheckedCreateWithoutAuthorInput[]
     connectOrCreate?: JobPostingCreateOrConnectWithoutAuthorInput | JobPostingCreateOrConnectWithoutAuthorInput[]
     upsert?: JobPostingUpsertWithWhereUniqueWithoutAuthorInput | JobPostingUpsertWithWhereUniqueWithoutAuthorInput[]
-    createMany?: JobPostingCreateManyAuthorInputEnvelope
     set?: JobPostingWhereUniqueInput | JobPostingWhereUniqueInput[]
     disconnect?: JobPostingWhereUniqueInput | JobPostingWhereUniqueInput[]
     delete?: JobPostingWhereUniqueInput | JobPostingWhereUniqueInput[]
@@ -5199,10 +5056,6 @@ export namespace Prisma {
     create: XOR<JobPostingCreateWithoutAuthorInput, JobPostingUncheckedCreateWithoutAuthorInput>
   }
 
-  export type JobPostingCreateManyAuthorInputEnvelope = {
-    data: JobPostingCreateManyAuthorInput | JobPostingCreateManyAuthorInput[]
-  }
-
   export type PasswordUpsertWithoutUserInput = {
     update: XOR<PasswordUpdateWithoutUserInput, PasswordUncheckedUpdateWithoutUserInput>
     create: XOR<PasswordCreateWithoutUserInput, PasswordUncheckedCreateWithoutUserInput>
@@ -5373,27 +5226,6 @@ export namespace Prisma {
     firstName?: StringFieldUpdateOperationsInput | string
     lastName?: StringFieldUpdateOperationsInput | string
     password?: PasswordUncheckedUpdateOneWithoutUserNestedInput
-  }
-
-  export type JobPostingCreateManyAuthorInput = {
-    id?: string
-    createdAt?: Date | string
-    updatedAt?: Date | string
-    jobTitle: string
-    companyName: string
-    companyWebsite?: string | null
-    category: string
-    employmentType: string
-    salaryMin?: number | null
-    salaryMax?: number | null
-    salaryType: string
-    partOfTown?: string | null
-    workPresence: string
-    jobDescription: string
-    linkToApply?: string | null
-    contactEmail?: string | null
-    contactPhone?: string | null
-    customInstructions?: string | null
   }
 
   export type JobPostingUpdateWithoutAuthorInput = {
