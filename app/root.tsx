@@ -3,7 +3,6 @@ import { json } from '@remix-run/node'
 import {
   Link,
   Links,
-  LiveReload,
   Meta,
   Outlet,
   Scripts,
@@ -132,7 +131,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
         </footer>
         <ScrollRestoration />
         <Scripts />
-        <LiveReload />
         <Toaster />
       </body>
     </html>
