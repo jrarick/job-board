@@ -43,7 +43,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </head>
       <body className="font-serif selection:bg-primary selection:text-primary-foreground">
         <header className="py-8 px-12 border-b border-border">
-          <div className="flex flex-row justify-between items-center">
+          <div className="flex flex-row justify-center items-center">
             <Link
               to="/"
               className="uppercase font-display font-medium tracking-widest antialiased max-w-1/2 text-2xl sm:text-3xl"

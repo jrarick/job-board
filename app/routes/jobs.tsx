@@ -12,6 +12,7 @@ import { Clock, MapPin } from 'lucide-react'
 import ReadOnlyEditor from '~/components/rich-text-editor/ReadOnlyEditor'
 import { useMediaQuery } from '~/lib/useMediaQuery'
 import { getJobPostings } from '~/models/jobPosting.server'
+import { requireUserId } from '~/session.server'
 import { timeSincePosted } from '~/utils'
 
 // import { useOptionalUser } from "~/utils"
@@ -28,7 +29,8 @@ interface JobPreviewType {
 
 export const meta: MetaFunction = () => [{ title: 'Providence Job Board' }]
 
-export const loader: LoaderFunction = async () => {
+export const loader: LoaderFunction = async ({ request }) => {
+  await requireUserId(request)
   const jobsQuery = await getJobPostings()
 
   if (!jobsQuery) {

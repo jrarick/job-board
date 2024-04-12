@@ -30,8 +30,10 @@ import {
 import { Textarea } from '~/components/ui/textarea'
 import JOB_CATEGORIES from '~/constants/JOB_CATEGORIES'
 import { getJobPosting, updateJobPosting } from '~/models/jobPosting.server'
+import { requireUserId } from '~/session.server'
 
-export async function loader({ params }: LoaderFunctionArgs) {
+export async function loader({ request, params }: LoaderFunctionArgs) {
+  await requireUserId(request)
   const job = await getJobPosting(params.jobId!)
 
   if (!job) {
@@ -100,7 +102,7 @@ export default function EditJob() {
   const [editorState, setEditorState] = useState<string | null>(null)
 
   return (
-    <div className="mx-auto max-w-7xl sm:px-6 lg:px-8 py-20 flex flex-col items-center">
+    <div className="mx-auto max-w-7xl sm:px-6 lg:px-8 py-20 flex flex-col items-center px-2">
       <Card className="max-w-4xl">
         <Form method="post">
           <CardHeader>

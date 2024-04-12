@@ -1,4 +1,4 @@
-import { ActionFunction, MetaFunction, json, redirect } from '@remix-run/node'
+import { ActionFunction, LoaderFunctionArgs, MetaFunction, json, redirect } from '@remix-run/node'
 import { Form, Link } from '@remix-run/react'
 import { useState } from 'react'
 
@@ -26,6 +26,11 @@ import { Textarea } from '~/components/ui/textarea'
 import JOB_CATEGORIES from '~/constants/JOB_CATEGORIES'
 import { createJobPosting } from '~/models/jobPosting.server'
 import { requireUserId } from '~/session.server'
+
+export async function loader({ request }: LoaderFunctionArgs) {
+  await requireUserId(request)
+  return json({})
+}
 
 export const action: ActionFunction = async ({ request }) => {
   const userId = await requireUserId(request)
@@ -97,7 +102,7 @@ export default function NewJobsPage() {
   const [editorState, setEditorState] = useState<string | null>(null)
 
   return (
-    <div className="mx-auto max-w-7xl sm:px-6 lg:px-8 py-20 flex flex-col items-center">
+    <div className="mx-auto max-w-7xl sm:px-6 lg:px-8 py-20 flex flex-col items-center px-2">
       <Card className="max-w-4xl">
         <Form method="post">
           <CardHeader>

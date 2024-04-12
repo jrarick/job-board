@@ -266,7 +266,7 @@ export default function Admin() {
             <AlertDialogContent>
               <AlertDialogHeader>
                 <AlertDialogTitle className="text-2xl mb-2">
-                  {`Are you sure you want to delete ${user.firstName} {user.lastName}'s account?`}
+                  {`Are you sure you want to delete ${user.firstName} ${user.lastName}'s account?`}
                 </AlertDialogTitle>
                 <AlertDialogDescription>
                   This action cannot be undone. This will permanently delete
