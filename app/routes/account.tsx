@@ -4,8 +4,19 @@ import {
   MetaFunction,
   json,
 } from '@remix-run/node'
-import { Form, Link, Outlet, useFetcher, useLoaderData } from '@remix-run/react'
+import { Form, Link, Outlet, useLoaderData } from '@remix-run/react'
 import { SquarePen, Trash } from 'lucide-react'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '~/components/ui/alert-dialog'
 
 import { Button, buttonVariants } from '~/components/ui/button'
 import { cn } from '~/lib/utils'
@@ -45,7 +56,6 @@ export const meta: MetaFunction = () => {
 
 export default function Account() {
   const { jobsByUser } = useLoaderData<typeof loader>()
-  const fetcher = useFetcher()
 
   return (
     <div className="mx-auto max-w-6xl px-2 sm:px-6 lg:px-8 py-20">
@@ -91,18 +101,41 @@ export default function Account() {
                   >
                     <SquarePen className="size-4" />
                   </Link>
-                  <fetcher.Form method="post" action="/account">
-                    <input type="hidden" name="jobId" value={job.id} />
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="hover:bg-destructive/10"
-                      type="submit"
-                      aria-label={`Delete ${job.jobTitle} job posting`}
-                    >
-                      <Trash className="size-4 text-destructive" />
-                    </Button>
-                  </fetcher.Form>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="hover:bg-destructive/10"
+                      >
+                        <Trash className="size-4 text-destructive" />
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle className="text-2xl mb-2">
+                          Are you sure you want to delete this job posting?
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This action cannot be undone. This will permanently
+                          delete this job posting and remove it from our
+                          servers.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter className="mt-4">
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <Form method="post" action="/account">
+                          <input type="hidden" name="jobId" value={job.id} />
+                          <AlertDialogAction
+                            type="submit"
+                            className="bg-background text-destructive border border-destructive hover:bg-destructive/10 transition-colors"
+                          >
+                            Delete
+                          </AlertDialogAction>
+                        </Form>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </li>
               ))}
             </ul>
@@ -129,11 +162,7 @@ export default function Account() {
         </div>
       </div>
       <Form method="post" action="/logout">
-        <Button
-          type="submit"
-          variant="default"
-          className="mt-8"
-        >
+        <Button type="submit" variant="default" className="mt-8">
           Logout
         </Button>
       </Form>
