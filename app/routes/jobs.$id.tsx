@@ -11,8 +11,8 @@ import {
 } from 'lucide-react'
 import { useEffect } from 'react'
 
-import JobPosting from '~/components/JobPosting'
-import ReadOnlyEditor from '~/components/rich-text-editor/ReadOnlyEditor'
+import JobPosting from '~/components/common/job-posting'
+import ReadOnlyEditor from '~/components/rich-text-editor/read-only-editor'
 import { buttonVariants } from '~/components/ui/button'
 import {
   Drawer,

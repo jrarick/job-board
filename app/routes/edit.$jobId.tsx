@@ -7,7 +7,7 @@ import {
 import { Form, Link, useLoaderData } from '@remix-run/react'
 import { useState } from 'react'
 
-import Editor from '~/components/rich-text-editor/Editor'
+import Editor from '~/components/rich-text-editor/editor'
 import { Button, buttonVariants } from '~/components/ui/button'
 import {
   Card,
@@ -30,6 +30,7 @@ import {
 import { Textarea } from '~/components/ui/textarea'
 import JOB_CATEGORIES from '~/constants/JOB_CATEGORIES'
 import { getJobPosting, updateJobPosting } from '~/models/jobPosting.server'
+import { jobPostingSchema } from '~/schemas/jobPostingSchema'
 import { requireUserId } from '~/session.server'
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
@@ -44,48 +45,42 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 }
 
 export async function action({ request, params }: ActionFunctionArgs) {
-  const formData = await request.formData()
+  const formPayload = Object.fromEntries(await request.formData())
 
-  const jobTitle = formData.get('jobTitle') as string
-  const companyName = formData.get('companyName') as string
-  const category = formData.get('category') as string
-  const employmentType = formData.get('employmentType') as string
-  const jobDescription = String(formData.get('jobDescription')) as string
-  const salaryMin = Number(formData.get('salaryMin'))
-  const salaryMax = Number(formData.get('salaryMax'))
-  const salaryType = formData.get('salaryType') as string
-  const partOfTown = formData.get('partOfTown') as string
-  const workPresence = formData.get('workPresence') as string
-  const companyWebsite = formData.get('companyWebsite') as string
-  const linkToApply = formData.get('linkToApply') as string
-  const contactEmail = formData.get('contactEmail') as string
-  const contactPhone = formData.get('contactPhone') as string
-  const customInstructions = formData.get('customInstructions') as string
+  try {
+    const jobPostingData = jobPostingSchema.parse(formPayload)
 
-  const updatedJob = await updateJobPosting({
-    id: params.jobId as string,
-    jobTitle,
-    companyName,
-    category,
-    employmentType,
-    jobDescription,
-    salaryMin: Number(salaryMin),
-    salaryMax: Number(salaryMax),
-    salaryType,
-    partOfTown,
-    workPresence,
-    companyWebsite,
-    linkToApply,
-    contactEmail,
-    contactPhone,
-    customInstructions,
-  })
+    await updateJobPosting({
+      id: params.jobId as string,
+      jobTitle: jobPostingData.jobTitle,
+      companyName: jobPostingData.companyName,
+      category: jobPostingData.category,
+      employmentType: jobPostingData.employmentType,
+      jobDescription: jobPostingData.jobDescription,
+      salaryMin: jobPostingData.salaryMin || null,
+      salaryMax: jobPostingData.salaryMax || null,
+      salaryType: jobPostingData.salaryType,
+      partOfTown: jobPostingData.partOfTown || '',
+      workPresence: jobPostingData.workPresence,
+      companyWebsite: jobPostingData.companyWebsite || '',
+      linkToApply: jobPostingData.linkToApply || '',
+      contactEmail: jobPostingData.contactEmail || '',
+      contactPhone: jobPostingData.contactPhone || '',
+      customInstructions: jobPostingData.customInstructions || '',
+    })
 
-  if (!updatedJob) {
-    return json({ error: 'Failed to update job' }, { status: 500 })
+    return redirect(`/jobs/${params.jobId}?job_updated=true`)
+  } catch (error) {
+    return json(
+      {
+        errors: {
+          body: error,
+          title: 'An error occurred. Make sure all required fields are entered.',
+        },
+      },
+      { status: 400 }
+    )
   }
-
-  return redirect(`/jobs/${params.jobId}?job_updated=true`)
 }
 
 export default function EditJob() {
@@ -107,7 +102,7 @@ export default function EditJob() {
         <Form method="post">
           <CardHeader>
             <CardTitle className="text-3xl font-display font-medium">
-              Advertise A Job
+              Update Job Posting
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -364,7 +359,7 @@ export default function EditJob() {
           <CardFooter>
             <div>
               <div className="space-x-6">
-                <Button type="submit">Submit</Button>
+                <Button type="submit">Save</Button>
                 <Link
                   className={buttonVariants({
                     variant: 'ghost',

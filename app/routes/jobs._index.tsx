@@ -1,7 +1,7 @@
 import { MetaFunction, json } from '@remix-run/node'
 import { useLoaderData } from '@remix-run/react'
 
-import JobPosting from '~/components/JobPosting'
+import JobPosting from '~/components/common/job-posting'
 import { useMediaQuery } from '~/lib/useMediaQuery'
 import { getFirstJob } from '~/models/jobPosting.server'
 import { formatSalaryString } from '~/utils'

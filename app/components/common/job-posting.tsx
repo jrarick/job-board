@@ -8,8 +8,8 @@ import {
   MapPin,
 } from 'lucide-react'
 
-import ReadOnlyEditor from './rich-text-editor/ReadOnlyEditor'
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from './ui/card'
+import ReadOnlyEditor from '../rich-text-editor/read-only-editor'
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '../ui/card'
 
 interface JobPostingProps {
   job: {
@@ -18,14 +18,14 @@ interface JobPostingProps {
     companyName: string
     formattedSalaryString: string
     employmentType: string
-    partOfTown: string | null
+    partOfTown?: string
     workPresence: string
-    companyWebsite: string | null
+    companyWebsite?: string
     jobDescription: string
-    linkToApply: string | null
-    contactEmail: string | null
-    contactPhone: string | null
-    customInstructions: string | null
+    linkToApply?: string
+    contactEmail?: string
+    contactPhone?: string
+    customInstructions?: string
     createdAt: string
     author: {
       firstName: string

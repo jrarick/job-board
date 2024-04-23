@@ -125,9 +125,9 @@ export function formatMoney(amount: number) {
 }
 
 export function formatSalaryString(
-  salaryMin: number | null,
-  salaryMax: number | null,
-  salaryType: string | null
+  salaryMin?: number,
+  salaryMax?: number,
+  salaryType?: string
 ) {
   if (!salaryMin && !salaryMax) {
     return 'Not specified'
