@@ -44,6 +44,12 @@ export function getJobPosting(id: JobPosting['id']) {
   })
 }
 
+export function getJobPostingWithoutAuthor(id: JobPosting['id']) {
+  return prisma.jobPosting.findFirst({
+    where: { id },
+  })
+}
+
 export function getJobPostingsByAuthorId(authorId: JobPosting['authorId']) {
   return prisma.jobPosting.findMany({
     orderBy: { createdAt: 'desc' },

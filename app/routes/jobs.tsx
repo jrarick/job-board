@@ -9,7 +9,7 @@ import {
 import clsx from 'clsx'
 import { Clock, MapPin } from 'lucide-react'
 
-import ReadOnlyEditor from '~/components/rich-text-editor/ReadOnlyEditor'
+import ReadOnlyEditor from '~/components/rich-text-editor/read-only-editor'
 import { useMediaQuery } from '~/lib/useMediaQuery'
 import { getJobPostings } from '~/models/jobPosting.server'
 import { requireUserId } from '~/session.server'
@@ -24,7 +24,7 @@ interface JobPreviewType {
   id: string
   jobDescription: string
   jobTitle: string
-  partOfTown: string | null
+  partOfTown?: string
 }
 
 export const meta: MetaFunction = () => [{ title: 'Providence Job Board' }]

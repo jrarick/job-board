@@ -69,9 +69,9 @@ export default function Account() {
               {jobsByUser.map((job) => (
                 <li
                   key={job.id}
-                  className="flex flex-row items-center space-x-2 p-2"
+                  className="flex flex-row items-center justify-between py-2 sm:px-2"
                 >
-                  <div className="flex-grow">
+                  <div className="">
                     <Link
                       to={`/jobs/${job.id}`}
                       className={cn(
@@ -91,51 +91,53 @@ export default function Account() {
                       </time>
                     </p>
                   </div>
-                  <Link
-                    to={`/edit/${job.id}`}
-                    className={buttonVariants({
-                      variant: 'ghost',
-                      size: 'icon',
-                    })}
-                    aria-label={`Edit ${job.jobTitle} job posting`}
-                  >
-                    <SquarePen className="size-4" />
-                  </Link>
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="hover:bg-destructive/10"
-                      >
-                        <Trash className="size-4 text-destructive" />
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle className="text-2xl mb-2">
-                          Are you sure you want to delete this job posting?
-                        </AlertDialogTitle>
-                        <AlertDialogDescription>
-                          This action cannot be undone. This will permanently
-                          delete this job posting and remove it from our
-                          servers.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter className="mt-4">
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <Form method="post" action="/account">
-                          <input type="hidden" name="jobId" value={job.id} />
-                          <AlertDialogAction
-                            type="submit"
-                            className="bg-background text-destructive border border-destructive hover:bg-destructive/10 transition-colors"
-                          >
-                            Delete
-                          </AlertDialogAction>
-                        </Form>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
+                  <div className="flex flex-row space-x-2 ml-2">
+                    <Link
+                      to={`/edit/${job.id}`}
+                      className={buttonVariants({
+                        variant: 'ghost',
+                        size: 'icon',
+                      })}
+                      aria-label={`Edit ${job.jobTitle} job posting`}
+                    >
+                      <SquarePen className="size-4" />
+                    </Link>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="hover:bg-destructive/10"
+                        >
+                          <Trash className="size-4 text-destructive" />
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle className="text-2xl mb-2">
+                            Are you sure you want to delete this job posting?
+                          </AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This action cannot be undone. This will permanently
+                            delete this job posting and remove it from our
+                            servers.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter className="mt-4">
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <Form method="post" action="/account">
+                            <input type="hidden" name="jobId" value={job.id} />
+                            <AlertDialogAction
+                              type="submit"
+                              className="bg-background text-destructive border border-destructive hover:bg-destructive/10 transition-colors"
+                            >
+                              Delete
+                            </AlertDialogAction>
+                          </Form>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
                 </li>
               ))}
             </ul>
