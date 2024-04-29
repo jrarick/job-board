@@ -17,6 +17,7 @@ import FloatingLinkEditorPlugin from './plugins/FloatingLinkEditorPlugin'
 import OnChangePlugin from './plugins/OnChangePlugin'
 import { PopulateEditorContentPlugin } from './plugins/PopulateEditorContentPlugin'
 import ToolbarPlugin from './plugins/ToolbarPlugin'
+import { cn } from '~/lib/utils'
 
 export const provTheme = {
   paragraph: 'leading-7 [&:not(:first-child)]:mt-2',
@@ -57,9 +58,11 @@ export const editorConfig = {
 const Editor = ({
   setEditorState,
   jobDescription,
+  className,
 }: {
   setEditorState: Dispatch<SetStateAction<string | null>>
   jobDescription?: string
+  className?: string
 }) => {
   const [floatingAnchorElem, setFloatingAnchorElem] =
     useState<HTMLDivElement | null>(null)
@@ -80,12 +83,17 @@ const Editor = ({
     <ClientOnly>
       {() => (
         <LexicalComposer initialConfig={editorConfig}>
-          <div className="bg-background border border-input rounded has-[:focus-visible]:ring-offset-2 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring">
+          <div className={cn(
+            "bg-background border border-input rounded has-[:focus-visible]:ring-offset-2 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring",
+            className
+            )}>
             <ToolbarPlugin />
             <div className="text-sm relative">
               <RichTextPlugin
                 contentEditable={
-                  <div ref={onRef}>
+                  <div
+                    className="max-h-96 overflow-y-auto relative"
+                  ref={onRef}>
                     <ContentEditable className="p-3 min-h-56 focus-visible:outline-none" />
                   </div>
                 }

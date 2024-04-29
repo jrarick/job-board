@@ -1,5 +1,4 @@
 import { Form, Link } from '@remix-run/react'
-import JOB_CATEGORIES from '~/constants/JOB_CATEGORIES'
 import Editor from '../rich-text-editor/editor'
 import { Button, buttonVariants } from '../ui/button'
 import {
@@ -23,14 +22,20 @@ import {
 import { RadioGroup, RadioGroupItem } from '../ui/radio-group'
 import { useState } from 'react'
 import { JobPosting } from '@prisma/client'
-import { ZodError } from 'zod'
+import JOB_CATEGORIES from '~/constants/JOB_CATEGORIES'
+import WORK_PRESENCE from '~/constants/WORK_PRESENCE'
+import EMPLOYMENT_TYPE from '~/constants/EMPLOYMENT_TYPE'
+import SALARY_TYPE from '~/constants/SALARY_TYPE'
+import { cn } from '~/lib/utils'
+import { JobPostingFormErrors } from '~/lib/validateJobPostingInput'
+import { SerializeFrom } from '@remix-run/node'
 
 export default function JobPostingForm({
   job,
   errors,
 }: {
-  job?: JobPosting
-  errors?: ZodError
+  job?: SerializeFrom<JobPosting>
+  errors?: JobPostingFormErrors
 }) {
   const [howToApply, setHowToApply] = useState(
     job && job.contactEmail
@@ -42,7 +47,6 @@ export default function JobPostingForm({
           : 'applyOnline'
   )
   const [editorState, setEditorState] = useState<string | null>(null)
-  console.log(errors)
 
   return (
     <Card className="max-w-4xl">
@@ -53,17 +57,28 @@ export default function JobPostingForm({
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid lg:grid-cols-2 lg:gap-x-20 space-y-8 lg:space-y-0">
-            <div className="flex flex-col space-y-8">
+          <div className="grid lg:grid-cols-2 lg:gap-x-20 space-y-4 lg:space-y-0">
+            <div className="flex flex-col space-y-4">
               <div className="grid w-full max-w-sm items-center gap-1.5">
                 <Label htmlFor="jobTitle">Job Title*</Label>
                 <Input
                   type="text"
                   name="jobTitle"
                   id="jobTitle"
-                  required={true}
                   defaultValue={job ? job.jobTitle : undefined}
+                  className={
+                    errors?.jobTitle
+                      ? 'outline-none ring-2 ring-destructive ring-offset-2'
+                      : ''
+                  }
                 />
+                {errors?.jobTitle ? (
+                  <p className="h-4 text-destructive text-xs">
+                    {errors.jobTitle}
+                  </p>
+                ) : (
+                  <span className="h-4" aria-hidden={true} />
+                )}
               </div>
               <div className="grid w-full max-w-sm items-center gap-1.5">
                 <Label htmlFor="companyName">Company Name*</Label>
@@ -71,9 +86,20 @@ export default function JobPostingForm({
                   type="text"
                   name="companyName"
                   id="companyName"
-                  required={true}
                   defaultValue={job ? job.companyName : undefined}
+                  className={
+                    errors?.companyName
+                      ? 'outline-none ring-2 ring-destructive ring-offset-2'
+                      : ''
+                  }
                 />
+                {errors?.companyName ? (
+                  <p className="h-4 text-destructive text-xs">
+                    {errors.companyName}
+                  </p>
+                ) : (
+                  <span className="h-4" aria-hidden={true} />
+                )}
               </div>
               <div className="grid w-full max-w-sm items-center gap-1.5">
                 <div className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
@@ -81,11 +107,15 @@ export default function JobPostingForm({
                 </div>
                 <Select
                   name="category"
-                  required={true}
                   aria-label="category"
                   defaultValue={job ? job.category : undefined}
                 >
-                  <SelectTrigger className="w-full">
+                  <SelectTrigger
+                    className={cn('w-full', {
+                      'outline-none ring-2 ring-destructive ring-offset-2':
+                        errors?.category,
+                    })}
+                  >
                     <SelectValue placeholder="Select" />
                   </SelectTrigger>
                   <SelectContent>
@@ -98,6 +128,13 @@ export default function JobPostingForm({
                     </SelectGroup>
                   </SelectContent>
                 </Select>
+                {errors?.category ? (
+                  <p className="h-4 text-destructive text-xs">
+                    {errors.category}
+                  </p>
+                ) : (
+                  <span className="h-4" aria-hidden={true} />
+                )}
               </div>
               <div className="grid w-full max-w-sm items-center gap-1.5">
                 <div className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
@@ -105,23 +142,34 @@ export default function JobPostingForm({
                 </div>
                 <Select
                   name="employmentType"
-                  required={true}
                   aria-label="Employment Type"
                   defaultValue={job ? job.employmentType : undefined}
                 >
-                  <SelectTrigger className="w-full">
+                  <SelectTrigger
+                    className={cn('w-full', {
+                      'outline-none ring-2 ring-destructive ring-offset-2':
+                        errors?.employmentType,
+                    })}
+                  >
                     <SelectValue placeholder="Select" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectGroup>
-                      <SelectItem value="Full-time">Full-time</SelectItem>
-                      <SelectItem value="Part-time">Part-time</SelectItem>
-                      <SelectItem value="Contract">Contract</SelectItem>
-                      <SelectItem value="Internship">Internship</SelectItem>
-                      <SelectItem value="Volunteer">Volunteer</SelectItem>
+                      {EMPLOYMENT_TYPE.map((type) => (
+                        <SelectItem value={type} key={type}>
+                          {type}
+                        </SelectItem>
+                      ))}
                     </SelectGroup>
                   </SelectContent>
                 </Select>
+                {errors?.employmentType ? (
+                  <p className="h-4 text-destructive text-xs">
+                    {errors.employmentType}
+                  </p>
+                ) : (
+                  <span className="h-4" aria-hidden={true} />
+                )}
               </div>
               <div className="grid w-full gap-1.5 max-w-sm">
                 <div className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
@@ -130,7 +178,19 @@ export default function JobPostingForm({
                 <Editor
                   setEditorState={setEditorState}
                   jobDescription={job ? job.jobDescription : undefined}
+                  className={
+                    errors?.jobDescription
+                      ? 'outline-none ring-2 ring-destructive ring-offset-2'
+                      : ''
+                  }
                 />
+                {errors?.jobDescription ? (
+                  <p className="h-4 text-destructive text-xs">
+                    {errors.jobDescription}
+                  </p>
+                ) : (
+                  <span className="h-4" aria-hidden={true} />
+                )}
                 <input
                   defaultValue={editorState || ''}
                   hidden={true}
@@ -138,7 +198,7 @@ export default function JobPostingForm({
                 />
               </div>
             </div>
-            <div className="flex flex-col space-y-8">
+            <div className="flex flex-col space-y-4">
               <div className="grid w-full max-w-sm items-center gap-1.5">
                 <Label htmlFor="salaryMin">Salary</Label>
                 <div className="flex flex-row items-center space-x-2 sm:space-x-4">
@@ -155,7 +215,10 @@ export default function JobPostingForm({
                       name="salaryMin"
                       min={0}
                       placeholder="0"
-                      className="pl-5 w-full"
+                      className={cn('pl-5 w-full', {
+                        'outline-none ring-2 ring-destructive ring-offset-2':
+                          errors?.salaryMin,
+                      })}
                       defaultValue={job ? Number(job.salaryMin) : undefined}
                     />
                   </div>
@@ -174,7 +237,10 @@ export default function JobPostingForm({
                       name="salaryMax"
                       min={0}
                       placeholder="0"
-                      className="pl-5 w-full"
+                      className={cn('pl-5 w-full', {
+                        'outline-none ring-2 ring-destructive ring-offset-2':
+                          errors?.salaryMax,
+                      })}
                       defaultValue={job ? Number(job.salaryMax) : undefined}
                     />
                   </div>
@@ -183,17 +249,40 @@ export default function JobPostingForm({
                     defaultValue={job ? job.salaryType : 'Per Hour'}
                     aria-label="Salary Type"
                   >
-                    <SelectTrigger className="w-40">
+                    <SelectTrigger
+                      className={cn('w-40', {
+                        'outline-none ring-2 ring-destructive ring-offset-2':
+                          errors?.salaryType,
+                      })}
+                    >
                       <SelectValue placeholder="Salary Type" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
-                        <SelectItem value="Per Hour">Per Hour</SelectItem>
-                        <SelectItem value="Yearly">Yearly</SelectItem>
+                        {SALARY_TYPE.map((type) => (
+                          <SelectItem value={type} key={type}>
+                            {type}
+                          </SelectItem>
+                        ))}
                       </SelectGroup>
                     </SelectContent>
                   </Select>
                 </div>
+                {errors?.salaryMin ? (
+                  <p className="h-4 text-destructive text-xs">
+                    {errors.salaryMin}
+                  </p>
+                ) : errors?.salaryMax ? (
+                  <p className="h-4 text-destructive text-xs">
+                    {errors.salaryMax}
+                  </p>
+                ) : errors?.salaryType ? (
+                  <p className="h-4 text-destructive text-xs">
+                    {errors.salaryType}
+                  </p>
+                ) : (
+                  <span className="h-4" aria-hidden={true} />
+                )}
               </div>
               <div className="grid w-full max-w-sm items-center gap-1.5">
                 <Label htmlFor="partOfTown">Part of Town</Label>
@@ -213,18 +302,32 @@ export default function JobPostingForm({
                     defaultValue={job ? job.workPresence : 'In person'}
                     aria-label="Work Presence"
                   >
-                    <SelectTrigger className="w-40">
+                    <SelectTrigger
+                      className={cn('w-40', {
+                        'outline-none ring-2 ring-destructive ring-offset-2':
+                          errors?.workPresence,
+                      })}
+                    >
                       <SelectValue placeholder="Select" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
-                        <SelectItem value="In person">In person</SelectItem>
-                        <SelectItem value="Remote">Remote</SelectItem>
-                        <SelectItem value="Hybrid">Hybrid</SelectItem>
+                        {WORK_PRESENCE.map((presence) => (
+                          <SelectItem value={presence} key={presence}>
+                            {presence}
+                          </SelectItem>
+                        ))}
                       </SelectGroup>
                     </SelectContent>
                   </Select>
                 </div>
+                {errors?.workPresence ? (
+                  <p className="h-4 text-destructive text-xs">
+                    {errors.workPresence}
+                  </p>
+                ) : (
+                  <span className="h-4" aria-hidden={true} />
+                )}
               </div>
               <div className="grid w-full max-w-sm items-center gap-1.5">
                 <Label htmlFor="companyWebsite">Company Website</Label>
@@ -232,15 +335,28 @@ export default function JobPostingForm({
                   type="url"
                   id="companyWebsite"
                   name="companyWebsite"
+                  className={
+                    errors?.companyWebsite
+                      ? 'outline-none ring-2 ring-destructive ring-offset-2'
+                      : ''
+                  }
                   defaultValue={
                     job?.companyWebsite ? job.companyWebsite : undefined
                   }
                 />
+                {errors?.companyWebsite ? (
+                  <p className="h-4 text-destructive text-xs">
+                    {errors.companyWebsite}
+                  </p>
+                ) : (
+                  <span className="h-4" aria-hidden={true} />
+                )}
               </div>
               <RadioGroup
                 defaultValue={howToApply}
                 onValueChange={(value) => setHowToApply(value)}
                 aria-label="How to Apply"
+                className="pb-4"
               >
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="applyOnline" id="r1" />
@@ -259,63 +375,98 @@ export default function JobPostingForm({
                   <Label htmlFor="r4">Custom Application Instructions</Label>
                 </div>
               </RadioGroup>
-              {howToApply === 'applyOnline' ? (
-                <div className="grid w-full max-w-sm items-center gap-1.5">
-                  <Label htmlFor="linkToApply">Link To Apply*</Label>
-                  <Input
-                    type="url"
-                    id="linkToApply"
-                    name="linkToApply"
-                    required={true}
-                    defaultValue={
-                      job?.linkToApply ? job.linkToApply : undefined
-                    }
-                  />
-                </div>
-              ) : howToApply === 'emailResume' ? (
-                <div className="grid w-full max-w-sm items-center gap-1.5">
-                  <Label htmlFor="contactEmail">Contact Email*</Label>
-                  <Input
-                    type="email"
-                    id="contactEmail"
-                    name="contactEmail"
-                    required={true}
-                    defaultValue={
-                      job?.contactEmail ? job.contactEmail : undefined
-                    }
-                  />
-                </div>
-              ) : howToApply === 'callPhone' ? (
-                <div className="grid w-full max-w-sm items-center gap-1.5">
-                  <Label htmlFor="contactPhone">Contact Phone*</Label>
-                  <Input
-                    type="tel"
-                    id="contactPhone"
-                    name="contactPhone"
-                    required={true}
-                    defaultValue={
-                      job?.contactPhone ? job.contactPhone : undefined
-                    }
-                  />
-                </div>
-              ) : howToApply === 'customInstructions' ? (
-                <div className="grid w-full gap-1.5 max-w-sm">
-                  <Label htmlFor="customInstructions">
-                    Custom Application Instructions*
-                  </Label>
-                  <Textarea
-                    id="customInstructions"
-                    name="customInstructions"
-                    required={true}
-                    className="min-h-32"
-                    defaultValue={
-                      job?.customInstructions
-                        ? job.customInstructions
-                        : undefined
-                    }
-                  />
-                </div>
-              ) : null}
+              <input type="hidden" name="howToApply" value={howToApply} />
+              <div className="grid w-full max-w-sm items-center gap-1.5">
+                <Label
+                  htmlFor={
+                    howToApply === 'applyOnline'
+                      ? 'linkToApply'
+                      : howToApply === 'emailResume'
+                        ? 'contactEmail'
+                        : howToApply === 'callPhone'
+                          ? 'contactPhone'
+                          : howToApply === 'customInstructions'
+                            ? 'customInstructions'
+                            : ''
+                  }
+                >
+                  {howToApply === 'applyOnline'
+                    ? 'Link To Apply*'
+                    : howToApply === 'emailResume'
+                      ? 'Contact Email*'
+                      : howToApply === 'callPhone'
+                        ? 'Contact Phone*'
+                        : howToApply === 'customInstructions'
+                          ? 'Custom Application Instructions*'
+                          : ''}
+                </Label>
+                <Input
+                  type={howToApply === 'applyOnline' ? 'url' : 'hidden'}
+                  id="linkToApply"
+                  name="linkToApply"
+                  defaultValue={job?.linkToApply ? job.linkToApply : undefined}
+                  className={
+                    errors?.linkToApply
+                      ? 'outline-none ring-2 ring-destructive ring-offset-2'
+                      : ''
+                  }
+                />
+                <Input
+                  type={howToApply === 'emailResume' ? 'email' : 'hidden'}
+                  id="contactEmail"
+                  name="contactEmail"
+                  hidden={howToApply !== 'emailResume'}
+                  defaultValue={
+                    job?.contactEmail ? job.contactEmail : undefined
+                  }
+                  className={
+                    errors?.contactEmail
+                      ? 'outline-none ring-2 ring-destructive ring-offset-2'
+                      : ''
+                  }
+                />
+                <Input
+                  type={howToApply === 'callPhone' ? 'tel' : 'hidden'}
+                  id="contactPhone"
+                  name="contactPhone"
+                  hidden={howToApply !== 'callPhone'}
+                  defaultValue={
+                    job?.contactPhone ? job.contactPhone : undefined
+                  }
+                  className={
+                    errors?.contactPhone
+                      ? 'outline-none ring-2 ring-destructive ring-offset-2'
+                      : ''
+                  }
+                />
+                <Textarea
+                  id="customInstructions"
+                  name="customInstructions"
+                  hidden={howToApply !== 'customInstructions'}
+                  className={cn('min-h-32', {
+                    hidden: howToApply !== 'customInstructions',
+                    'outline-none ring-2 ring-destructive ring-offset-2':
+                      errors?.customInstructions,
+                  })}
+                  defaultValue={
+                    job?.customInstructions ? job.customInstructions : undefined
+                  }
+                />
+                {(errors?.linkToApply && howToApply === 'applyOnline') ||
+                (errors?.contactEmail && howToApply === 'emailResume') ||
+                (errors?.contactPhone && howToApply === 'callPhone') ||
+                (errors?.customInstructions &&
+                  howToApply === 'customInstructions') ? (
+                  <p className="h-4 text-destructive text-xs">
+                    {errors?.linkToApply ||
+                      errors?.contactEmail ||
+                      errors?.contactPhone ||
+                      errors?.customInstructions}
+                  </p>
+                ) : (
+                  <span className="h-4" aria-hidden={true} />
+                )}
+              </div>
             </div>
           </div>
         </CardContent>

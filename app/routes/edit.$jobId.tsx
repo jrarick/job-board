@@ -4,38 +4,16 @@ import {
   json,
   redirect,
 } from '@remix-run/node'
-import { Form, Link, useLoaderData } from '@remix-run/react'
-import { useState } from 'react'
+import { useActionData, useLoaderData } from '@remix-run/react'
+import JobPostingForm from '~/components/common/job-posting-form'
+import { validateJobPostingInput } from '~/lib/validateJobPostingInput'
 
-import Editor from '~/components/rich-text-editor/editor'
-import { Button, buttonVariants } from '~/components/ui/button'
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-  CardFooter,
-} from '~/components/ui/card'
-import { Input } from '~/components/ui/input'
-import { Label } from '~/components/ui/label'
-import { RadioGroup, RadioGroupItem } from '~/components/ui/radio-group'
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '~/components/ui/select'
-import { Textarea } from '~/components/ui/textarea'
-import JOB_CATEGORIES from '~/constants/JOB_CATEGORIES'
-import { getJobPosting, updateJobPosting } from '~/models/jobPosting.server'
-import { jobPostingSchema } from '~/schemas/jobPostingSchema'
+import { getJobPostingWithoutAuthor, updateJobPosting } from '~/models/jobPosting.server'
 import { requireUserId } from '~/session.server'
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   await requireUserId(request)
-  const job = await getJobPosting(params.jobId!)
+  const job = await getJobPostingWithoutAuthor(params.jobId!)
 
   if (!job) {
     throw new Error('Job not found')
@@ -45,60 +23,81 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 }
 
 export async function action({ request, params }: ActionFunctionArgs) {
-  const formPayload = Object.fromEntries(await request.formData())
+  const formData = await request.formData()
+
+  const jobTitle = String(formData.get('jobTitle'))
+  const companyName = String(formData.get('companyName'))
+  const category = String(formData.get('category'))
+  const employmentType = String(formData.get('employmentType'))
+  const jobDescription = String(formData.get('jobDescription'))
+  const salaryMin = Number(formData.get('salaryMin')) || null
+  const salaryMax = Number(formData.get('salaryMax')) || null
+  const salaryType = String(formData.get('salaryType'))
+  const partOfTown = String(formData.get('partOfTown'))
+  const workPresence = String(formData.get('workPresence'))
+  const companyWebsite = String(formData.get('companyWebsite'))
+  const howToApply = String(formData.get('howToApply'))
+  const linkToApply = String(formData.get('linkToApply'))
+  const contactEmail = String(formData.get('contactEmail'))
+  const contactPhone = String(formData.get('contactPhone'))
+  const customInstructions = String(formData.get('customInstructions'))
+
+  const errors = validateJobPostingInput(
+    jobTitle,
+    companyName,
+    category,
+    employmentType,
+    jobDescription,
+    salaryMin,
+    salaryMax,
+    salaryType,
+    workPresence,
+    companyWebsite,
+    howToApply,
+    linkToApply,
+    contactEmail,
+    contactPhone,
+    customInstructions,
+  )
+  
+  if (Object.values(errors).some(Boolean)) {
+    return json({ errors }, { status: 400 })
+  }
 
   try {
-    const jobPostingData = jobPostingSchema.parse(formPayload)
-
     await updateJobPosting({
-      id: params.jobId as string,
-      jobTitle: jobPostingData.jobTitle,
-      companyName: jobPostingData.companyName,
-      category: jobPostingData.category,
-      employmentType: jobPostingData.employmentType,
-      jobDescription: jobPostingData.jobDescription,
-      salaryMin: jobPostingData.salaryMin || null,
-      salaryMax: jobPostingData.salaryMax || null,
-      salaryType: jobPostingData.salaryType,
-      partOfTown: jobPostingData.partOfTown || '',
-      workPresence: jobPostingData.workPresence,
-      companyWebsite: jobPostingData.companyWebsite || '',
-      linkToApply: jobPostingData.linkToApply || '',
-      contactEmail: jobPostingData.contactEmail || '',
-      contactPhone: jobPostingData.contactPhone || '',
-      customInstructions: jobPostingData.customInstructions || '',
+      id: String(params.jobId),
+      jobTitle,
+      companyName,
+      category,
+      employmentType,
+      jobDescription,
+      salaryMin,
+      salaryMax,
+      salaryType,
+      partOfTown,
+      workPresence,
+      companyWebsite,
+      linkToApply,
+      contactEmail,
+      contactPhone,
+      customInstructions,
     })
-
+  
     return redirect(`/jobs/${params.jobId}?job_updated=true`)
   } catch (error) {
-    return json(
-      {
-        errors: {
-          body: error,
-          title: 'An error occurred. Make sure all required fields are entered.',
-        },
-      },
-      { status: 400 }
-    )
+    console.log(error)
   }
 }
 
 export default function EditJob() {
   const { job } = useLoaderData<typeof loader>()
-  const [howToApply, setHowToApply] = useState(
-    job.contactEmail
-      ? 'emailResume'
-      : job.contactPhone
-        ? 'callPhone'
-        : job.customInstructions
-          ? 'customInstructions'
-          : 'applyOnline'
-  )
-  const [editorState, setEditorState] = useState<string | null>(null)
+  const actionData = useActionData<typeof action>()
 
   return (
     <div className="mx-auto max-w-7xl sm:px-6 lg:px-8 py-20 flex flex-col items-center px-2">
-      <Card className="max-w-4xl">
+      <JobPostingForm job={job} errors={actionData?.errors} />
+      {/* <Card className="max-w-4xl">
         <Form method="post">
           <CardHeader>
             <CardTitle className="text-3xl font-display font-medium">
@@ -167,11 +166,11 @@ export default function EditJob() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
-                        <SelectItem value="Full-time">Full-time</SelectItem>
-                        <SelectItem value="Part-time">Part-time</SelectItem>
-                        <SelectItem value="Contract">Contract</SelectItem>
-                        <SelectItem value="Internship">Internship</SelectItem>
-                        <SelectItem value="Volunteer">Volunteer</SelectItem>
+                        {EMPLOYMENT_TYPE.map((type) => (
+                          <SelectItem value={type} key={type}>
+                            {type}
+                          </SelectItem>
+                        ))}
                       </SelectGroup>
                     </SelectContent>
                   </Select>
@@ -239,8 +238,11 @@ export default function EditJob() {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectGroup>
-                          <SelectItem value="Per Hour">Per Hour</SelectItem>
-                          <SelectItem value="Yearly">Yearly</SelectItem>
+                          {SALARY_TYPE.map((type) => (
+                            <SelectItem value={type} key={type}>
+                              {type}
+                            </SelectItem>
+                          ))}
                         </SelectGroup>
                       </SelectContent>
                     </Select>
@@ -267,9 +269,11 @@ export default function EditJob() {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectGroup>
-                          <SelectItem value="In person">In person</SelectItem>
-                          <SelectItem value="Remote">Remote</SelectItem>
-                          <SelectItem value="Hybrid">Hybrid</SelectItem>
+                          {WORK_PRESENCE.map((presence) => (
+                            <SelectItem value={presence} key={presence}>
+                              {presence}
+                            </SelectItem>
+                          ))}
                         </SelectGroup>
                       </SelectContent>
                     </Select>
@@ -375,7 +379,7 @@ export default function EditJob() {
             </div>
           </CardFooter>
         </Form>
-      </Card>
+      </Card> */}
     </div>
   )
 }
