@@ -18,14 +18,14 @@ interface JobPostingProps {
     companyName: string
     formattedSalaryString: string
     employmentType: string
-    partOfTown?: string
+    partOfTown?: string | null
     workPresence: string
-    companyWebsite?: string
+    companyWebsite?: string | null
     jobDescription: string
-    linkToApply?: string
-    contactEmail?: string
-    contactPhone?: string
-    customInstructions?: string
+    linkToApply?: string | null
+    contactEmail?: string | null
+    contactPhone?: string | null
+    customInstructions?: string | null
     createdAt: string
     author: {
       firstName: string

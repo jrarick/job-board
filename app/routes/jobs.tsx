@@ -1,21 +1,23 @@
-import type { LoaderFunction, MetaFunction } from '@remix-run/node'
+import type { LoaderFunctionArgs, MetaFunction } from '@remix-run/node'
 import {
   Link,
   Outlet,
   json,
   useLoaderData,
   useLocation,
+  useSearchParams,
 } from '@remix-run/react'
 import clsx from 'clsx'
 import { Clock, MapPin } from 'lucide-react'
 
 import ReadOnlyEditor from '~/components/rich-text-editor/read-only-editor'
+import { buttonVariants } from '~/components/ui/button'
+import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '~/components/ui/pagination'
+import RESULTS_PER_PAGE from '~/constants/RESULTS_PER_PAGE'
 import { useMediaQuery } from '~/lib/useMediaQuery'
-import { getJobPostings } from '~/models/jobPosting.server'
+import { getJobPostings, getJobPostingsCount } from '~/models/jobPosting.server'
 import { requireUserId } from '~/session.server'
 import { timeSincePosted } from '~/utils'
-
-// import { useOptionalUser } from "~/utils"
 
 interface JobPreviewType {
   category: string
@@ -24,17 +26,21 @@ interface JobPreviewType {
   id: string
   jobDescription: string
   jobTitle: string
-  partOfTown?: string
+  partOfTown?: string | null
 }
 
 export const meta: MetaFunction = () => [{ title: 'Providence Job Board' }]
 
-export const loader: LoaderFunction = async ({ request }) => {
+export async function loader({ request }: LoaderFunctionArgs) {
+  const url = new URL(request.url)
+  const page = Number(url.searchParams.get('page')) || 1
+
   await requireUserId(request)
-  const jobsQuery = await getJobPostings()
+  const jobsQuery = await getJobPostings(page)
+  const jobPostingsCount = await getJobPostingsCount()
 
   if (!jobsQuery) {
-    return json({ jobs: [] })
+    return json({ jobs: [], jobPostingsCount: 0 })
   }
 
   const jobs = jobsQuery.map((job) => ({
@@ -47,15 +53,17 @@ export const loader: LoaderFunction = async ({ request }) => {
     partOfTown: job.partOfTown,
   }))
 
-  return json({ jobs })
+  return json({ jobs, jobPostingsCount })
 }
 
 const JobPreviewCard = ({
   job,
   index,
+  page
 }: {
   job: JobPreviewType
   index: number
+  page: number
 }) => {
   const location = useLocation()
   const isActive = location.pathname.includes(job.id)
@@ -78,7 +86,10 @@ const JobPreviewCard = ({
         </span>
         <h2 className="min-w-0 font-bold text-xl mt-3">
           <Link
-            to={`/jobs/${job.id}`}
+            to={{
+              pathname: `/jobs/${job.id}`,
+              search: `?page=${page}`,
+            }}
             className="focus-visible:outline-none focus-visible:ring-none"
             unstable_viewTransition
             preventScrollReset={true}
@@ -105,25 +116,108 @@ const JobPreviewCard = ({
   )
 }
 
-export default function Index() {
-  const { jobs } = useLoaderData<typeof loader>()
 
-  // const user = useOptionalUser()
+
+export default function Index() {
+  const { jobs, jobPostingsCount } = useLoaderData<typeof loader>()
+  const [searchParams] = useSearchParams()
+  const page = Number(searchParams.get('page')) || 1
+
+  const totalPageCount = Math.ceil(jobPostingsCount / RESULTS_PER_PAGE)
+  const currentPage = page
+  const maxPages = 5
+
+  const canPageBackwards: boolean = page > 1
+  const canPageForwards: boolean = page < totalPageCount
+
+  let pageNumbers = [] as Array<number | string>
+
+  if (totalPageCount <= maxPages) {
+    pageNumbers = Array.from({ length: totalPageCount }, (_, i) => i + 1)
+  } else {
+    if (page <= 2) {
+      pageNumbers = [1, 2, 3, 'ellipsis-end', totalPageCount]
+    } else if (page === 3) {
+      pageNumbers = [1, 2, 3, 4, 'ellipsis-end', totalPageCount]
+    } else if (page < totalPageCount - 2) {
+      pageNumbers = [1, 'ellipsis-start', page - 1, page, page + 1, 'ellipsis-end', totalPageCount]
+    } else if (page === totalPageCount - 2) {
+      pageNumbers = [1, 'ellipsis-start', totalPageCount - 3, totalPageCount - 2, totalPageCount - 1, totalPageCount]
+    } else if (page >= totalPageCount - 1) {
+      pageNumbers = [1, 'ellipsis-end', totalPageCount - 2, totalPageCount - 1, totalPageCount]
+    }
+  }
 
   return (
     <div className="flex min-h-full flex-col">
-      <div className="mx-auto flex w-full max-w-6xl items-start gap-x-8 px-4 sm:px-6 lg:px-8">
-        <div className="flex-1 py-10">
-          <ul className="flex flex-col space-y-8">
-            {jobs.map((job: JobPreviewType, index: number) => (
-              <JobPreviewCard key={job.id} index={index} job={job} />
-            ))}
-          </ul>
+      {page <= totalPageCount && page > 0 ? (
+        <div className="mx-auto flex w-full max-w-6xl items-start gap-x-8 px-4 sm:px-6 lg:px-8">
+          <div className="flex-1 py-10">
+            <ul className="flex flex-col space-y-8">
+              {jobs && jobs.map((job, index) => (
+                <JobPreviewCard key={job.id} index={index} job={job} page={page} />
+              ))}
+            </ul>
+          </div>
+          <div className="sticky top-0 bottom-0 hidden w-[36rem] shrink-0 lg:block py-10">
+            <Outlet />
+          </div>
         </div>
-        <div className="sticky top-0 bottom-0 hidden w-[36rem] shrink-0 lg:block py-10">
-          <Outlet />
+      ) : (
+        <div className="mx-auto py-20 space-y-8">
+          <p className="font-medium text-3xl font-display">No jobs found</p>
+          <Link to="/" className={buttonVariants({ variant: 'default' })}>Go Back Home</Link>
         </div>
-      </div>
+      )}
+      <Pagination className="pb-8">
+        <PaginationContent>
+          <PaginationItem>
+            <PaginationPrevious
+              to={{
+                pathname: '/jobs',
+                search: `?page=${page - 1}`,
+              }}
+              preventScrollReset={true}
+              prefetch="intent"
+              unstable_viewTransition
+              className={canPageBackwards ? '' : 'opacity-50 pointer-events-none'}
+            />
+          </PaginationItem>
+          {pageNumbers.map((pageNumber) => (
+            <PaginationItem key={pageNumber}>
+              {typeof pageNumber === "string" && pageNumber.includes('ellipsis') ? (
+                <PaginationEllipsis />
+              ) : (
+                <PaginationLink
+                  isActive={pageNumber === currentPage}
+                  to={{
+                    pathname: '/jobs',
+                    search: `?page=${pageNumber}`,
+                  }}
+                  preventScrollReset={true}
+                  prefetch="intent"
+                  unstable_viewTransition
+                >
+                  {pageNumber}
+                </PaginationLink>
+              )}
+            </PaginationItem>
+
+          ))}
+          <PaginationItem>
+            <PaginationNext
+              to={{
+                pathname: '/jobs',
+                search: `?page=${page + 1}`,
+              }}
+              preventScrollReset={true}
+              prefetch="intent"
+              unstable_viewTransition
+              className={canPageForwards ? '' : 'opacity-50 pointer-events-none'}
+            />
+          </PaginationItem>
+        </PaginationContent>
+      </Pagination>
     </div>
   )
 }

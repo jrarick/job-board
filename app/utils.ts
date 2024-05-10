@@ -125,9 +125,9 @@ export function formatMoney(amount: number) {
 }
 
 export function formatSalaryString(
-  salaryMin?: number,
-  salaryMax?: number,
-  salaryType?: string
+  salaryMin?: number | null,
+  salaryMax?: number | null,
+  salaryType?: string | null
 ) {
   if (!salaryMin && !salaryMax) {
     return 'Not specified'
@@ -144,39 +144,22 @@ export function formatSalaryString(
   return `${formatMoney(salaryMin!)} - ${formatMoney(salaryMax!)} ${salaryType}`
 }
 
-export function getHtmlFromLexicalJSON(json: string): string {
-  const parsed = JSON.parse(json)
-  const root = parsed.root
-  return getHtmlFromLexicalNode(root)
-}
-
-export function getHtmlFromLexicalNode(node: {
-  type: string
-  children?: { type: string; text?: string; tag?: string }[]
-}): string {
-  let result = ''
-  const { children } = node
-  if (children !== undefined) {
-    if (children.length === 0) {
-      return result
+export function setSearchParamsString(
+  searchParams: URLSearchParams,
+  changes: Record<string, string | number | undefined>,
+) {
+  const newSearchParams = new URLSearchParams(searchParams)
+  for (const [key, value] of Object.entries(changes)) {
+    if (value === undefined) {
+      newSearchParams.delete(key)
+      continue
     }
-    children.forEach((child) => {
-      const { type } = child
-      if (type === 'paragraph') {
-        result += `<p>${getHtmlFromLexicalNode(child)}</p>`
-      } else if (type === 'heading') {
-        const tag = child.tag ?? 'h1'
-        result += `<${tag}>${getHtmlFromLexicalNode(child)}</${tag}>`
-      } else if (type === 'bullet') {
-        result += `<ul>${getHtmlFromLexicalNode(child)}</ul>`
-      } else if (type === 'listitem') {
-        result += `<li>${getHtmlFromLexicalNode(child)}</li>`
-      } else if (type === 'text') {
-        result += `<span>${child.text}</span>`
-      } else {
-        result += '<span style="font-weight: bold">Unknown Node</span>'
-      }
-    })
+    newSearchParams.set(key, String(value))
   }
-  return result
+
+  return Array.from(newSearchParams.entries())
+    .map(([key, value]) =>
+      value ? `${key}=${encodeURIComponent(value)}` : key,
+    )
+    .join("&")
 }
