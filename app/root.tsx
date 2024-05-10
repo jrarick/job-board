@@ -57,7 +57,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
               <div>Job Board</div>
             </Link>
             {data?.user && (<Link to="/account" aria-label="Link to account page" unstable_viewTransition>
-              <Avatar className="border-2 border-transparent hover:border-border transition-colors">
+              <Avatar className="border-2 border-border hover:border-primary transition-colors" title="Account">
                 <AvatarFallback className="font-bold font-display">
                   {data.user.firstName.slice(0, 1) + data.user.lastName.slice(0, 1)}
                 </AvatarFallback>
