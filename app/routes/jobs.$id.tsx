@@ -30,6 +30,7 @@ import { formatSalaryString } from '~/utils'
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const url = new URL(request.url)
   const showJobCreatedToast = url.searchParams.get('job_created') === 'true'
+  const showJobUpdatedToast = url.searchParams.get('job_updated') === 'true'
   const jobQuery = await getJobPosting(params.id!)
 
   if (!jobQuery) {
@@ -62,7 +63,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     ),
   }
 
-  return json({ job, showJobCreatedToast })
+  return json({ job, showJobCreatedToast, showJobUpdatedToast })
 }
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
@@ -74,7 +75,7 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
 }
 
 export default function JobPostingCard() {
-  const { job, showJobCreatedToast } = useLoaderData<typeof loader>()
+  const { job, showJobCreatedToast, showJobUpdatedToast } = useLoaderData<typeof loader>()
   const isDesktop = useMediaQuery('(min-width: 1024px)')
   const navigate = useNavigate()
 
@@ -124,8 +125,15 @@ export default function JobPostingCard() {
           description: `Posting for ${job.jobTitle} at ${job.companyName} has been created`,
         })
       }, 1000)
+    } else if (showJobUpdatedToast) {
+      setTimeout(() => {
+        toast({
+          title: 'Job posting updated',
+          description: `Posting for ${job.jobTitle} at ${job.companyName} has been updated`,
+        })
+      }, 1000)
     }
-  }, [showJobCreatedToast, job, toast])
+  }, [showJobCreatedToast, showJobUpdatedToast, job, toast])
 
   return (
     <>
@@ -133,7 +141,7 @@ export default function JobPostingCard() {
         <JobPosting job={job} />
       ) : (
         <Drawer open={true} onOpenChange={(open) => handleCloseDrawer(open)}>
-          <DrawerContent className="max-h-dvh">
+          <DrawerContent className="max-h-[85dvh]">
             <DrawerHeader>
               <DrawerTitle className="text-2xl text-left">
                 {job.jobTitle + ' / ' + job.companyName}
@@ -197,7 +205,7 @@ export default function JobPostingCard() {
                   Call{' '}
                   <a
                     href={`tel:${job.contactPhone}}`}
-                    className="text-foreground hover:underline font-semibold"
+                    className="text-foreground hover:underline font-semibold break-all"
                   >
                     {job.contactPhone}
                   </a>

@@ -1,16 +1,19 @@
-import { MetaFunction, json } from '@remix-run/node'
+import { LoaderFunctionArgs, MetaFunction, json } from '@remix-run/node'
 import { useLoaderData } from '@remix-run/react'
 
 import JobPosting from '~/components/common/job-posting'
 import { useMediaQuery } from '~/lib/useMediaQuery'
-import { getFirstJob } from '~/models/jobPosting.server'
+import { getFirstJobOnPage } from '~/models/jobPosting.server'
 import { formatSalaryString } from '~/utils'
 
-export async function loader() {
-  const firstJobQuery = await getFirstJob()
+export async function loader({ request }: LoaderFunctionArgs) {
+  const url = new URL(request.url)
+  const page = Number(url.searchParams.get('page')) || 1
+
+  const firstJobQuery = await getFirstJobOnPage(page)
 
   if (!firstJobQuery) {
-    throw new Error('Job not found')
+    return json({ firstJob: null })
   }
 
   const firstJob = {
@@ -50,7 +53,10 @@ export default function JobsIndex() {
   const isDesktop = useMediaQuery('(min-width: 1024px)')
   const { firstJob } = useLoaderData<typeof loader>()
 
-  if (isDesktop) {
-    return <JobPosting job={firstJob} />
-  } else return <></>
+  if (firstJob) {
+    if (isDesktop) {
+      return <JobPosting job={firstJob} />
+    } else return <></>
+  }
+  return <p className="mx-auto py-20">No job found</p>
 }

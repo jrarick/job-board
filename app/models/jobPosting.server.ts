@@ -1,9 +1,12 @@
 import type { JobPosting } from '@prisma/client'
+import RESULTS_PER_PAGE from '~/constants/RESULTS_PER_PAGE'
 
 import { prisma } from '~/db.server'
 
-export function getFirstJob() {
+export function getFirstJobOnPage(page: number = 1) {
   return prisma.jobPosting.findFirst({
+    skip: (page - 1) * RESULTS_PER_PAGE,
+    take: 1,
     orderBy: { createdAt: 'desc' },
     include: {
       author: {
@@ -16,8 +19,10 @@ export function getFirstJob() {
   })
 }
 
-export function getJobPostings() {
+export function getJobPostings(page: number = 1) {
   return prisma.jobPosting.findMany({
+    skip: (page - 1) * RESULTS_PER_PAGE,
+    take: RESULTS_PER_PAGE,
     include: {
       author: {
         select: {
@@ -55,6 +60,10 @@ export function getJobPostingsByAuthorId(authorId: JobPosting['authorId']) {
     orderBy: { createdAt: 'desc' },
     where: { authorId },
   })
+}
+
+export function getJobPostingsCount() {
+  return prisma.jobPosting.count()
 }
 
 export function deleteJobPosting(id: JobPosting['id']) {

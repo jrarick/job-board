@@ -84,8 +84,6 @@ export const meta: MetaFunction = () => {
 export default function NewJobsPage() {
   const actionData = useActionData<typeof action>()
 
-  console.log(actionData?.errors)
-
   return (
     <div className="mx-auto max-w-7xl sm:px-6 lg:px-8 py-20 flex flex-col items-center px-2">
       <JobPostingForm errors={actionData?.errors} />
