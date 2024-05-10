@@ -51,6 +51,7 @@ export default function UpdateUser() {
       method="post"
       action="/account/update-user"
       className="space-y-6 mt-4"
+      preventScrollReset
     >
       <div>
         <Label htmlFor="firstName">First Name</Label>

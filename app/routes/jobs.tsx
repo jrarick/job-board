@@ -153,7 +153,7 @@ export default function Index() {
       {page <= totalPageCount && page > 0 ? (
         <div className="mx-auto flex w-full max-w-6xl items-start gap-x-8 px-4 sm:px-6 lg:px-8">
           <div className="flex-1 py-10">
-            <ul className="flex flex-col space-y-8">
+            <ul className="flex flex-col space-y-8 mx-auto max-w-lg">
               {jobs && jobs.map((job, index) => (
                 <JobPreviewCard key={job.id} index={index} job={job} page={page} />
               ))}

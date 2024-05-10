@@ -9,6 +9,7 @@ import {
   ScrollRestoration,
   isRouteErrorResponse,
   useRouteError,
+  useRouteLoaderData,
 } from '@remix-run/react'
 
 import ProvidenceIcon from '~/assets/providence-icon.svg'
@@ -17,16 +18,19 @@ import '~/tailwind.css'
 
 import { buttonVariants } from './components/ui/button'
 import { Toaster } from './components/ui/toaster'
+import { Avatar, AvatarFallback } from './components/ui/avatar'
 
 export const links: LinksFunction = () => [
   { rel: 'stylesheet', href: 'https://use.typekit.net/jfz8jfw.css' },
 ]
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
+export async function loader({ request }: LoaderFunctionArgs) {
   return json({ user: await getUser(request) })
 }
 
 export function Layout({ children }: { children: React.ReactNode }) {
+  const data = useRouteLoaderData<typeof loader>('root')
+
   const footerItems = [
     { name: 'Browse Jobs', href: '/jobs' },
     { name: 'Advertise Job', href: '/advertise-job' },
@@ -43,7 +47,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </head>
       <body className="font-serif selection:bg-primary selection:text-primary-foreground">
         <header className="py-8 px-12 border-b border-border">
-          <div className="flex flex-row justify-center items-center">
+          <div className="flex flex-row justify-between items-center">
             <Link
               to="/"
               className="uppercase font-display font-medium tracking-widest antialiased max-w-1/2 text-2xl sm:text-3xl"
@@ -52,6 +56,13 @@ export function Layout({ children }: { children: React.ReactNode }) {
               <div>Providence</div>
               <div>Job Board</div>
             </Link>
+            {data?.user && (<Link to="/account" aria-label="Link to account page" unstable_viewTransition>
+              <Avatar className="border-2 border-transparent hover:border-border transition-colors">
+                <AvatarFallback className="font-bold font-display">
+                  {data.user.firstName.slice(0, 1) + data.user.lastName.slice(0, 1)}
+                </AvatarFallback>
+              </Avatar>
+            </Link>)}
           </div>
         </header>
 

@@ -39,6 +39,7 @@ export default function AccountIndex() {
         to="/account/update-user"
         className={buttonVariants({ variant: 'outline' })}
         unstable_viewTransition
+        preventScrollReset
       >
         Edit
       </Link>

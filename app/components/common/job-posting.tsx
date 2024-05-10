@@ -10,6 +10,7 @@ import {
 
 import ReadOnlyEditor from '../rich-text-editor/read-only-editor'
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '../ui/card'
+import { ClientOnly } from 'remix-utils/client-only'
 
 interface JobPostingProps {
   job: {
@@ -145,16 +146,20 @@ export default function JobPosting({ job }: JobPostingProps) {
         </div>
         <div className="flex space-x-2 text-muted-foreground font-bold leading-5">
           <Calendar className="h-4 w-auto flex-none" />
-          <time
-            dateTime={job.createdAt}
-            className="text-xs font-bold text-muted-foreground"
-          >
-            {`On ${new Date(job.createdAt).toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-            })}`}
-          </time>
+          <ClientOnly>
+            {() => (
+              <time
+                dateTime={job.createdAt}
+                className="text-xs font-bold text-muted-foreground"
+              >
+                {`On ${new Date(job.createdAt).toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                })}`}
+              </time>
+            )}
+          </ClientOnly>
         </div>
       </CardFooter>
     </Card>

@@ -6,6 +6,7 @@ import {
 } from '@remix-run/node'
 import { Form, Link, Outlet, useLoaderData } from '@remix-run/react'
 import { SquarePen, Trash } from 'lucide-react'
+import { ClientOnly } from 'remix-utils/client-only'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -80,16 +81,20 @@ export default function Account() {
                     >
                       {job.jobTitle} / {job.companyName}
                     </Link>
-                    <p className="text-muted-foreground text-xs font-semibold pt-1">
-                      Posted on{' '}
-                      <time dateTime={job.createdAt}>
-                        {new Date(job.createdAt).toLocaleDateString('en-US', {
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric',
-                        })}
-                      </time>
-                    </p>
+                    <ClientOnly>
+                      {() => (
+                        <p className="text-muted-foreground text-xs font-semibold pt-1">
+                          Posted on{' '}
+                          <time dateTime={job.createdAt}>
+                            {new Date(job.createdAt).toLocaleDateString('en-US', {
+                              year: 'numeric',
+                              month: 'long',
+                              day: 'numeric',
+                            })}
+                          </time>
+                        </p>
+                      )}
+                    </ClientOnly>
                   </div>
                   <div className="flex flex-row space-x-2 ml-2">
                     <Link
@@ -99,6 +104,7 @@ export default function Account() {
                         size: 'icon',
                       })}
                       aria-label={`Edit ${job.jobTitle} job posting`}
+                      title="Edit"
                     >
                       <SquarePen className="size-4" />
                     </Link>
@@ -108,6 +114,7 @@ export default function Account() {
                           variant="ghost"
                           size="icon"
                           className="hover:bg-destructive/10"
+                          title="Delete"
                         >
                           <Trash className="size-4 text-destructive" />
                         </Button>

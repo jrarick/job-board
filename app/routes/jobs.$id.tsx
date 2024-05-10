@@ -10,6 +10,7 @@ import {
   Calendar,
 } from 'lucide-react'
 import { useEffect } from 'react'
+import { ClientOnly } from 'remix-utils/client-only'
 
 import JobPosting from '~/components/common/job-posting'
 import ReadOnlyEditor from '~/components/rich-text-editor/read-only-editor'
@@ -227,19 +228,23 @@ export default function JobPostingCard() {
                   </div>
                   <div className="flex space-x-2 text-muted-foreground font-bold leading-5">
                     <Calendar className="h-4 w-auto flex-none" />
-                    <time
-                      dateTime={job.createdAt}
-                      className="text-xs font-bold text-muted-foreground"
-                    >
-                      {`On ${new Date(job.createdAt).toLocaleDateString(
-                        'en-US',
-                        {
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric',
-                        }
-                      )}`}
-                    </time>
+                    <ClientOnly>
+                      {() => (
+                        <time
+                          dateTime={job.createdAt}
+                          className="text-xs font-bold text-muted-foreground"
+                        >
+                          {`On ${new Date(job.createdAt).toLocaleDateString(
+                            'en-US',
+                            {
+                              year: 'numeric',
+                              month: 'long',
+                              day: 'numeric',
+                            }
+                          )}`}
+                        </time>
+                      )}
+                    </ClientOnly>
                   </div>
                 </div>
                 <DrawerClose

@@ -7,6 +7,7 @@ import {
   useReactTable,
 } from '@tanstack/react-table'
 import { Trash } from 'lucide-react'
+import { ClientOnly } from 'remix-utils/client-only'
 
 import {
   AlertDialog,
@@ -113,9 +114,9 @@ function DataTable<TData, TValue>({
                   {header.isPlaceholder
                     ? null
                     : flexRender(
-                        header.column.columnDef.header,
-                        header.getContext()
-                      )}
+                      header.column.columnDef.header,
+                      header.getContext()
+                    )}
                 </TableHead>
               ))}
             </TableRow>
@@ -182,7 +183,13 @@ export default function Admin() {
       header: 'Date',
       cell: ({ row }) => {
         const jobPosting = row.original
-        return <time dateTime={jobPosting.date}>{jobPosting.date}</time>
+        return (
+          <ClientOnly>
+            {() => (
+              <time dateTime={jobPosting.date}>{jobPosting.date}</time>
+            )}
+          </ClientOnly>
+        )
       },
     },
     {
