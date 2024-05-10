@@ -1,5 +1,5 @@
 import { LoaderFunctionArgs, MetaFunction, json } from '@remix-run/node'
-import { useLoaderData, useNavigate } from '@remix-run/react'
+import { useLoaderData, useLocation, useNavigate } from '@remix-run/react'
 import {
   Banknote,
   Briefcase,
@@ -9,15 +9,14 @@ import {
   Pen,
   Calendar,
 } from 'lucide-react'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { ClientOnly } from 'remix-utils/client-only'
 
 import JobPosting from '~/components/common/job-posting'
 import ReadOnlyEditor from '~/components/rich-text-editor/read-only-editor'
-import { buttonVariants } from '~/components/ui/button'
+import { Button } from '~/components/ui/button'
 import {
   Drawer,
-  DrawerClose,
   DrawerContent,
   DrawerFooter,
   DrawerHeader,
@@ -79,6 +78,8 @@ export default function JobPostingCard() {
   const { job, showJobCreatedToast, showJobUpdatedToast } = useLoaderData<typeof loader>()
   const isDesktop = useMediaQuery('(min-width: 1024px)')
   const navigate = useNavigate()
+  const location = useLocation()
+  const [drawerOpen, setDrawerOpen] = useState(true)
 
   const { toast } = useToast()
 
@@ -112,7 +113,10 @@ export default function JobPostingCard() {
 
   const handleCloseDrawer = (open: boolean) => {
     if (!open) {
-      navigate('/jobs', {
+      navigate({
+        pathname: '/jobs',
+        search: location.search || '',
+      }, {
         preventScrollReset: true,
       })
     }
@@ -141,8 +145,17 @@ export default function JobPostingCard() {
       {isDesktop ? (
         <JobPosting job={job} />
       ) : (
-        <Drawer open={true} onOpenChange={(open) => handleCloseDrawer(open)}>
-          <DrawerContent className="max-h-[85dvh]">
+        <Drawer open={drawerOpen} onOpenChange={(open) => handleCloseDrawer(open)}>
+          <DrawerContent className="max-h-[85dvh]"
+            onInteractOutside={(e) => {
+              e.preventDefault()
+              setDrawerOpen(false)
+            }}
+            onPointerDownOutside={(e) => {
+              e.preventDefault()
+              setDrawerOpen(false)
+            }}
+          >
             <DrawerHeader>
               <DrawerTitle className="text-2xl text-left">
                 {job.jobTitle + ' / ' + job.companyName}
@@ -157,7 +170,7 @@ export default function JobPostingCard() {
                       <span>{detail.label}</span>
                     </div>
                     {detail.label === 'Website' &&
-                    detail.value !== 'Not specified' ? (
+                      detail.value !== 'Not specified' ? (
                       <a
                         href={detail.value!}
                         target="_blank"
@@ -247,14 +260,13 @@ export default function JobPostingCard() {
                     </ClientOnly>
                   </div>
                 </div>
-                <DrawerClose
-                  className={buttonVariants({
-                    variant: 'outline',
-                    size: 'sm',
-                  })}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setDrawerOpen(false)}
                 >
                   Close
-                </DrawerClose>
+                </Button>
               </div>
             </DrawerFooter>
           </DrawerContent>
