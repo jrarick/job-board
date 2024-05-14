@@ -146,7 +146,7 @@ export default function JobPostingCard() {
         <JobPosting job={job} />
       ) : (
         <Drawer open={drawerOpen} onOpenChange={(open) => handleCloseDrawer(open)}>
-          <DrawerContent className="max-h-[85dvh]"
+          <DrawerContent className="h-[85dvh]"
             onInteractOutside={(e) => {
               e.preventDefault()
               setDrawerOpen(false)
@@ -161,13 +161,13 @@ export default function JobPostingCard() {
                 {job.jobTitle + ' / ' + job.companyName}
               </DrawerTitle>
             </DrawerHeader>
-            <div className="overflow-y-auto px-4">
+            <div className="overflow-y-auto px-4 scroller h-full">
               <ul className="py-4 space-y-3 border-b border-border text-foreground">
                 {details.map((detail) => (
                   <li key={detail.label} className="flex flex-row items-center">
-                    <div className="flex items-center space-x-2 text-sm leading-5 w-32">
+                    <div className="flex items-center space-x-2 text-sm leading-5 w-28 sm:w-32">
                       <detail.icon className="h-5 w-auto flex-none" />
-                      <span>{detail.label}</span>
+                      <span className="text-xs sm:text-sm font-bold sm:font-normal">{detail.label}</span>
                     </div>
                     {detail.label === 'Website' &&
                       detail.value !== 'Not specified' ? (
@@ -175,7 +175,7 @@ export default function JobPostingCard() {
                         href={detail.value!}
                         target="_blank"
                         rel="noreferrer"
-                        className="inline-flex rounded bg-secondary px-2 py-1 text-xs font-medium text-secondary-foreground ring-1 ring-inset ring-secondary-foreground/10 hover:underline text-left"
+                        className="inline-flex rounded bg-secondary px-2 py-1 text-xs font-medium text-secondary-foreground ring-1 ring-inset ring-secondary-foreground/10 hover:underline break-all"
                       >
                         {detail.value}
                       </a>
@@ -187,19 +187,20 @@ export default function JobPostingCard() {
                   </li>
                 ))}
               </ul>
+              <h3 className="font-display font-semibold text-2xl pt-4">Job Description</h3>
               <div className="text-longform-foreground prose prose-sm prose-h1:font-display prose-h1:text-2xl prose-h1:font-semibold prose-h1:tracking-tight prose-headings:text-foreground prose-h2:tracking-widest prose-h2:uppercase prose-h2:text-lg prose-blockquote:text-muted-foreground prose-a:text-foreground prose-a:font-semibold prose-strong:text-longform-foreground">
                 <ReadOnlyEditor
                   jobDescription={job.jobDescription}
                   jobId={job.id}
                 />
               </div>
-              <h3 className="text-xl font-bold">How To Apply</h3>
+              <h3 className="font-display font-semibold text-2xl">How To Apply</h3>
               {job.linkToApply ? (
                 <div className="pt-4 text-longform-foreground">
                   Visit{' '}
                   <a
                     href={job.linkToApply}
-                    className="text-foreground hover:underline font-semibold"
+                    className="text-foreground hover:underline font-semibold break-all"
                   >
                     {job.linkToApply}
                   </a>
@@ -209,7 +210,7 @@ export default function JobPostingCard() {
                   Send your resume to{' '}
                   <a
                     href={`mailto:${job.contactEmail}`}
-                    className="text-foreground hover:underline font-semibold"
+                    className="text-foreground hover:underline font-semibold break-all"
                   >
                     {job.contactEmail}
                   </a>
