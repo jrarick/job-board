@@ -146,7 +146,7 @@ export default function JobPostingCard() {
         <JobPosting job={job} />
       ) : (
         <Drawer open={drawerOpen} onOpenChange={(open) => handleCloseDrawer(open)}>
-          <DrawerContent className="h-[85dvh]"
+          <DrawerContent className="h-[85lvh]"
             onInteractOutside={(e) => {
               e.preventDefault()
               setDrawerOpen(false)
